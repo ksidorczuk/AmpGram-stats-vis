@@ -5,9 +5,10 @@ library(ggplot2)
 ui <- fluidPage(
     
     titlePanel("AmpGram results"),
-    h5("Shiny app for visualisation of statistics for the second layer of prediction. You can use
-               three different plots for visualisation, each is located in a seperate tab of a main panel 
-               below. You can find the description of all calculated statistics in the panel on the left side."),
+    h5("Shiny app for visualisation of statistics for the second layer of prediction. Data contains prediction
+        results from a random forest trained on (19,26] length group. You can use three different plots for 
+        visualisation, each is located in a seperate tab of a main panel below. You can find the description of 
+        all calculated statistics in the panel on the left side and a diagram in the Description tab."),
     sidebarLayout(
         sidebarPanel(
             h5(strong("Statistics calculated for each peptide:")),
@@ -17,7 +18,8 @@ ui <- fluidPage(
                         tags$li(tags$b("fraction_true"), "- fraction of positive mers"),
                         tags$li(tags$b("pred_mean"), "- mean value of prediction"),
                         tags$li(tags$b("pred_median"), "- median of prediction"),
-                        tags$li(tags$b("n_peptide"), "- number of positive mers"),
+                        tags$li(tags$b("n_peptide"), "- number of mers"),
+                        tags$li(tags$b("n_pos"), "- number of positive mers"),
                         tags$li(tags$b("pred_min"), "- minimum value of prediction"),
                         tags$li(tags$b("pred_max"), "- maximum value of prediction"),
                         tags$li(tags$b("longest_pos"), "- the longest stretch of mers occuring 
@@ -33,8 +35,11 @@ ui <- fluidPage(
             )
         ),
         mainPanel(
-            
             tabsetPanel(
+                tabPanel("Description",
+                         h5("Diagram showing how we get statistics for each peptide."),
+                         #img(src='fig1.png', align = "right", width = '100%'),
+                         img(src='stats.png', align = "right", width = '100%')),
                 tabPanel("Violin plot",
                          h5("View the distribution of statistics and its probability density. 
                             You can select different statistics and set custom length groups."),
