@@ -14,27 +14,7 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             h5(strong("Statistics calculated for each peptide:")),
-            h6(
-                tags$div(
-                    tags$ul(
-                        tags$li(tags$b("fraction_true"), "- fraction of positive mers"),
-                        tags$li(tags$b("pred_mean"), "- mean value of prediction"),
-                        tags$li(tags$b("pred_median"), "- median of prediction"),
-                        tags$li(tags$b("n_peptide"), "- number of mers"),
-                        tags$li(tags$b("n_pos"), "- number of positive mers"),
-                        tags$li(tags$b("pred_min"), "- minimum value of prediction"),
-                        tags$li(tags$b("pred_max"), "- maximum value of prediction"),
-                        tags$li(tags$b("longest_pos"), "- the longest stretch of mers occuring 
-                            one by one and predicted as positive"),
-                        tags$li(tags$b("n_pos_10"), "- number of streches comprising of at least 
-                    10 mers predicted as positive"),
-                        tags$li(tags$b("frac_0_0.2"), "- fraction of mers with prediction in range [0,0.2]"),
-                        tags$li(tags$b("frac_0.2_0.4"), "- fraction of mers with prediction in range (0.2,0.4]"),
-                        tags$li(tags$b("frac_0.4_0.6"), "- fraction of mers with prediction in range (0.4,0.6]"),
-                        tags$li(tags$b("frac_0.6_0.8"), "- fraction of mers with prediction in range (0.6,0.8]"),
-                        tags$li(tags$b("frac_0.8_1"), "- fraction of mers with prediction in range (0.8,1]"))
-                )
-            )
+            includeMarkdown("stats.md")
         ),
         mainPanel(
             tabsetPanel(

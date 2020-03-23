@@ -1,0 +1,15 @@
+- fraction_true - fraction of positive mers,
+- pred_mean - mean value of prediction,
+- pred_median - median of prediction,
+- n_peptide - number of mers,
+- n_pos - number of positive mers,
+- pred_min - minimum value of prediction,
+- pred_max - maximum value of prediction,
+- longest_pos - the longest stretch of mers occuring consecutively and predicted as positive,
+- n_pos_10 - number of streches comprising of at least 
+                    10 mers predicted as positive,
+- frac_0_0.2 - fraction of mers with prediction in range [0,0.2],
+- frac_0.2_0.4 - fraction of mers with prediction in range (0.2,0.4],
+- frac_0.4_0.6 - fraction of mers with prediction in range (0.4,0.6],
+- frac_0.6_0.8 - fraction of mers with prediction in range (0.6,0.8],
+- frac_0.8_1 - fraction of mers with prediction in range (0.8,1])
