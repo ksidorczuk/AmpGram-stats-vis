@@ -2,6 +2,8 @@ library(shiny)
 library(dplyr)
 library(ggplot2)
 
+layer_dat <- read.csv("layer_data.csv")
+
 ui <- fluidPage(
     
     titlePanel("AmpGram results"),
@@ -44,7 +46,7 @@ ui <- fluidPage(
                          h5("View the distribution of statistics and its probability density. 
                             You can select different statistics and set custom length groups."),
                          selectInput("y_violin", "Select data for y axis:",
-                                     choices = colnames(data)[5:18], selected = "fraction_true",
+                                     choices = colnames(layer_dat)[5:18], selected = "fraction_true",
                                      width = '150px'),
                          h5(strong("Select length ranges for x axis:")),
                          div(style="display: inline-block;vertical-align:top; width: 100px;",
@@ -70,11 +72,11 @@ ui <- fluidPage(
                          for both y and x axises."),
                          div(style="display: inline-block;vertical-align:top; width: 200px;",
                              selectInput("y_density", "Select data for y axis:",
-                                         choices = colnames(data)[5:18], selected = "fraction_true",
+                                         choices = colnames(layer_dat)[5:18], selected = "fraction_true",
                                          width = '150px')),
                          div(style="display: inline-block;vertical-align:top; width: 200px;",
                              selectInput("x_density", "Select data for x axis:",
-                                         choices = colnames(data)[5:18], selected = "n_peptide",
+                                         choices = colnames(layer_dat)[5:18], selected = "n_peptide",
                                          width = '150px')),
                          plotOutput("density_plot")
                 ),
@@ -85,7 +87,7 @@ ui <- fluidPage(
                          that can be selected below. You can change limits of the x axis to see other length ranges 
                          (max length of a peptide is 710)."),
                          selectInput("bar_plot", "Select data:",
-                                     choices = colnames(data[c(5:7,10:11,14:18)]), selected = "fraction_true",
+                                     choices = colnames(layer_dat[c(5:7,10:11,14:18)]), selected = "fraction_true",
                                      width = '150px'),
                          h5(strong("Select length ranges for x axis:")),
                          div(style="display: inline-block;vertical-align:top; width: 100px;",
@@ -103,7 +105,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     
-    data <- read.csv("layer_data.csv")
+    
     
     len_groups <- reactive({
         c(input[["gr1"]], input[["gr2"]], input[["gr3"]], input[["gr4"]], input[["gr5"]])
@@ -115,7 +117,7 @@ server <- function(input, output) {
     
     break_vals <- reactive({
         case_when(
-            input[["bar_plot"]] %in% colnames(data)[c(5:7, 10:11, 14:18)] ~ 0L:5/5,
+            input[["bar_plot"]] %in% colnames(layer_dat)[c(5:7, 10:11, 14:18)] ~ 0L:5/5,
             input[["bar_plot"]] == "n_pos" ~ c(0,1,10,20,50,187),
             input[["bar_plot"]] == "longest_pos" ~ c(0,1,5,15,30,85),
             input[["bar_plot"]] == "n_pos_10" ~ c(0,0.5,1,3,5,7)
@@ -123,8 +125,8 @@ server <- function(input, output) {
     })
     
     data_v <- reactive({
-        data %>% mutate(len = (n_peptide + 9),
-                   len_group = cut(len, breaks = len_groups(), include.lowest = TRUE))
+        layer_dat %>% mutate(len = (n_peptide + 9),
+                             len_group = cut(len, breaks = len_groups(), include.lowest = TRUE))
     })
     
     output[["violin_plot"]] <- renderPlot({
@@ -133,17 +135,17 @@ server <- function(input, output) {
     })
     
     output[["density_plot"]] <- renderPlot({
-        ggplot(data, aes_string(x = input[["x_density"]], y = input[["y_density"]], 
-                                fill = "target", color = "target")) +
+        ggplot(layer_dat, aes_string(x = input[["x_density"]], y = input[["y_density"]], 
+                                     fill = "target", color = "target")) +
             geom_point(aes(alpha = 0.01), position = "jitter") +
             stat_density2d(aes(alpha = ..level..), geom = "polygon", color = "black", size = 0.4) 
     })
     
     
     output[["col_plot"]] <- renderPlot({
-        data %>% 
+        layer_dat %>% 
             mutate(value_ranges = cut(get(input[["bar_plot"]]), breaks = break_vals(), 
-                             include.lowest = TRUE),
+                                      include.lowest = TRUE),
                    len = n_peptide + 9) %>% 
             group_by(target, len, value_ranges) %>% 
             summarise(n = length(get(input[["bar_plot"]]))) %>% 
@@ -155,7 +157,6 @@ server <- function(input, output) {
             theme_bw() +
             scale_x_continuous(limits = len_limits()) +
             labs(y ="proportion of peptides", x = "lenght of peptides")
-        
     })
 }
 
