@@ -58,7 +58,23 @@ ui <- fluidPage(
                              selectInput("x_density", "Select data for x axis:",
                                          choices = colnames(layer_dat)[5:18], selected = "n_peptide",
                                          width = '150px')),
-                         plotOutput("density_plot")
+                         h5(strong("Select length ranges for faceting:")),
+                         div(style="display: inline-block;vertical-align:top; width: 100px;",
+                             numericInput("f1", label = NULL,
+                                          min = 1, max = 710, value = 1, width = '80px')),
+                         div(style="display: inline-block;vertical-align:top; width: 100px;",
+                             numericInput("f2", label = NULL,
+                                          min = 1, max = 710, value = 50, width = '80px')),
+                         div(style="display: inline-block;vertical-align:top; width: 100px;",
+                             numericInput("f3", label = NULL,
+                                          min = 1, max = 710, value = 100, width = '80px')),
+                         div(style="display: inline-block;vertical-align:top; width: 100px;",
+                             numericInput("f4", label = NULL,
+                                          min = 1, max = 710, value = 200, width = '80px')),
+                         div(style="display: inline-block;vertical-align:top; width: 100px;",
+                             numericInput("f5", label = NULL,
+                                          min = 1, max = 710, value = 710, width = '80px')),
+                         plotOutput("density_plot", height = '600px')
                 ),
                 tabPanel("Bar plot",
                          h5("View the ranges of a given statistic in the proportion of all peptides. The upper
@@ -91,6 +107,10 @@ server <- function(input, output) {
         c(input[["gr1"]], input[["gr2"]], input[["gr3"]], input[["gr4"]], input[["gr5"]])
     })
     
+    f_groups <- reactive({
+        c(input[["f1"]], input[["f2"]], input[["f3"]], input[["f4"]], input[["f5"]])
+    })
+    
     len_limits <- reactive({
         c(input[["start"]], input[["end"]])
     })
@@ -104,6 +124,11 @@ server <- function(input, output) {
         )
     })
     
+    data_2d <- reactive({
+        mutate(layer_dat, len = (n_peptide + 9),
+               len_group = cut(len, breaks = f_groups(), include.lowest = TRUE))
+    })
+    
     data_v <- reactive({
         layer_dat %>% mutate(len = (n_peptide + 9),
                              len_group = cut(len, breaks = len_groups(), include.lowest = TRUE))
@@ -115,10 +140,11 @@ server <- function(input, output) {
     })
     
     output[["density_plot"]] <- renderPlot({
-        ggplot(layer_dat, aes_string(x = input[["x_density"]], y = input[["y_density"]], 
+        ggplot(data_2d(), aes_string(x = input[["x_density"]], y = input[["y_density"]], 
                                      fill = "target", color = "target")) +
             geom_point(aes(alpha = 0.01), position = "jitter") +
-            stat_density2d(aes(alpha = ..level..), geom = "polygon", color = "black", size = 0.4) 
+            stat_density2d(aes(alpha = ..level..), geom = "polygon", color = "black", size = 0.4) +
+            facet_wrap(~ len_group, scales = "free_x")
     })
     
     
